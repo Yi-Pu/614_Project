@@ -54,6 +54,11 @@ def add_to_database(file):
 
     # Initial count
     num_rows_inserted = 0
+    num_hospitals_inserted  = 0
+
+    check = pd.read_sql_query("SELECT hospital_pk"
+                              "FROM hospital_basic_info", conn)
+    comparison = set(check.hospital_pk.unique())
 
     with conn.transaction():
         for index, row in file.iterrows():
@@ -116,10 +121,14 @@ def add_to_database(file):
             else:
                 num_rows_inserted += 1
 
+                if row['hospital_pk'] not in comparison:
+                    num_hospitals_inserted += 1
+
     conn.commit()
 
     discardFile = "hhs_discard.csv"
     print("The number of rows added: " + str(num_rows_inserted))
+    print("Number of Hospitals Inserted: " + str(num_hospitals_inserted))
     discard.to_csv(discardFile, index=False)
     return
 
