@@ -64,7 +64,7 @@ def add_to_database(file):
                         "INSERT INTO geographic_info (geocoded_hospital_address, \
                             zip, city, fips_code, state, address)"
                         "VALUES (%s, %s, %s, %s, %s, %s)"
-                        "ON CONFLICT(geocoded_hospital_address) DO UPDATE SET"
+                        "ON CONFLICT (geocoded_hospital_address) DO UPDATE SET"
                         "(zip, city, fips_code, state, address) = \
                             (EXCLUDED.zip, EXCLUDED.city, \
                             EXCLUDED.fips_code, EXCLUDED.state, \
