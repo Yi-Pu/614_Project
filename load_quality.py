@@ -1,4 +1,5 @@
-'''This script adds hospital quality ratings to the database and updates ownership, emergency services and type'''
+'''This script adds hospital quality ratings to the database
+ and updates ownership, emergency services and type'''
 
 import psycopg
 import credentials
@@ -7,24 +8,27 @@ import sys
 
 
 def process_csv(file):
-    '''This function processes and cleans the new csv of hospital quality ratings
-    
+    '''This function processes and cleans the csv of hospital quality ratings
+
        Parameters:
 
        file: The csv file path
     '''
     quality_data = pd.read_csv(file)
 
-    quality_data.loc[quality_data['Emergency Services'] == "Yes", 'Emergency Services'] = "TRUE"
-    quality_data.loc[quality_data['Emergency Services'] == "No", 'Emergency Services'] = "FALSE"
-    quality_data.loc[quality_data['Hospital overall rating'] == "Not Available", 'Hospital overall rating'] = "null"
-    
+    quality_data.loc[quality_data['Emergency Services'] == "Yes",
+                     'Emergency Services'] = "TRUE"
+    quality_data.loc[quality_data['Emergency Services'] == "No",
+                     'Emergency Services'] = "FALSE"
+    quality_data.loc[quality_data['Hospital overall rating'] ==
+                     "Not Available", 'Hospital overall rating'] = "null"
+
     return quality_data
 
 
 def add_to_database(file, date):
     '''Inputs the necessary data from the csv into the database
-    
+
        Parameters:
 
        file: A Pandas Dataframe of the CSV
@@ -32,8 +36,8 @@ def add_to_database(file, date):
     '''
 
     conn = psycopg.connect(
-    host="sculptor.stat.cmu.edu", dbname=credentials.DB_USER,
-    user=credentials.DB_USER, password=credentials.DB_PASSWORD)
+            host="sculptor.stat.cmu.edu", dbname=credentials.DB_USER,
+            user=credentials.DB_USER, password=credentials.DB_PASSWORD)
 
     cur = conn.cursor()
 
@@ -41,7 +45,8 @@ def add_to_database(file, date):
     num_hospitals_inserted = 0
     discard = pd.DataFrame(columns=file.columns)
 
-    check = pd.read_sql_query("SELECT hospital_pk FROM hospital_basic_info", conn)
+    check = pd.read_sql_query("SELECT hospital_pk"
+                              " FROM hospital_basic_info", conn)
     comparison = set(check.hospital_pk.unique())
 
     with conn.transaction():
@@ -49,35 +54,43 @@ def add_to_database(file, date):
             try:
                 with conn.transaction():
                     cur.execute(
-                        "INSERT INTO hospital_basic_info (hospital_pk, name, type, ownership_type, emergency_services)"
+                        "INSERT INTO hospital_basic_info"
+                        "(hospital_pk, name, type, ownership_type,"
+                        " emergency_services)"
                         "VALUES (%s, %s, %s, %s, %s)"
                         "ON CONFLICT(hospital_pk) DO UPDATE SET"
-                        "(type, ownership_type, emergency_services) = (EXCLUDED.type, EXCLUDED.ownership_type, EXCLUDED.emergency_services)",
+                        "(type, ownership_type, emergency_services) ="
+                        "(EXCLUDED.type, EXCLUDED.ownership_type,"
+                        " EXCLUDED.emergency_services)",
                         (row['Facility ID'], row['Facility Name'],
-                        row['Hospital Type'], row['Hospital Ownership'],
-                        row['Emergency Services'])
+                         row['Hospital Type'], row['Hospital Ownership'],
+                         row['Emergency Services'])
                     )
-
-                    if row['Facility ID'] not in comparison:
-                        num_hospitals_inserted += 1
 
                     if row['Hospital overall rating'] == "null":
                         cur.execute(
                             "INSERT INTO quality_rating (facility_id, date)"
-                            "VALUES (%s, to_date(%s, 'YYYY-MM-DD'))", 
+                            "VALUES (%s, to_date(%s, 'YYYY-MM-DD'))",
                             (row["Facility ID"], date))
                     else:
                         cur.execute(
-                            "INSERT INTO quality_rating (facility_id, date, hospital_overall_rating)"
-                            "VALUES (%s, to_date(%s, 'YYYY-MM-DD'), %s)", 
-                            (row["Facility ID"], date, row['Hospital overall rating']))
-                    
+                            "INSERT INTO quality_rating (facility_id, date,"
+                            " hospital_overall_rating)"
+                            "VALUES (%s, to_date(%s, 'YYYY-MM-DD'), %s)",
+                            (row["Facility ID"], date,
+                             row['Hospital overall rating']))
+
             except Exception as e:
+                print(e)
                 print("insert failed")
                 print("row " + str(index) + " failed.")
                 discard = discard.append(row)
             else:
                 num_rows_inserted += 1
+
+                if row['Facility ID'] not in comparison:
+                    num_hospitals_inserted += 1
+
     conn.commit()
 
     discardFile = "quality_discard-" + date + ".csv"
