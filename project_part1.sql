@@ -16,7 +16,6 @@ and 1-to-many info on weekly statistics and quality entities. Note that now that
 this cuts out a lot of the redundant information as these two can just be referenced by their relevant IDs when we are looking at weekly statistics or quality ratings, 
 which are related in their own separate ways and should be considered as their own entities..*/
 
-/* This is the table categorizing the geographic information of each hospital */
 CREATE TABLE geographic_info(
 geocoded_hospital_address TEXT PRIMARY KEY,
 zip TEXT,
@@ -25,42 +24,42 @@ fips_code TEXT,
 state CHAR(2),
 address TEXT
 );
-/*This next table references the hospital basic metadata */
+
 CREATE TABLE hospital_basic_info (
 hospital_pk TEXT PRIMARY KEY,
 name TEXT NOT NULL,
-geocoded_hospital_address TEXT
-REFERENCES geographic_info,
+geocoded_hospital_address TEXT,
 type TEXT,
+ownership_type TEXT,
 emergency_services BOOLEAN DEFAULT FALSE
 );
-/* Table holding the weekly statistic entities of hospitals */
+
+
 CREATE TABLE hospital_capacity (
-hospital_pk TEXT 
-REFERENCES hospital_basic_info,
+hospital_pk TEXT,
 date DATE,
-all_adult_hospital_beds_7_day_avg INTEGER
-CHECK (all_adult_hospital_beds_7_day_avg > 0),
-all_pediatric_inpatient_beds_7_day_avg INTEGER
-CHECK (all_pediatric_inpatient_beds_7_day_avg > 0),
-all_adult_hospital_inpatient_bed_occupied_7_day_coverage INTEGER
-CHECK (all_adult_hospital_inpatient_bed_occupied_7_day_coverage > 0),
-all_pediatric_inpatient_bed_occupied_7_day_avg INTEGER
-CHECK (all_pediatric_inpatient_bed_occupied_7_day_avg > 0),
-total_icu_beds_7_day_avg INTEGER
-CHECK (total_icu_beds_7_day_avg > 0),
-icu_beds_used_7_day_avg INTEGER
-CHECK (icu_beds_used_7_day_avg > 0),
-inpatient_beds_used_covid_7_day_avg INTEGER
-CHECK (inpatient_beds_used_covid_7_day_avg > 0),
-staffed_adult_icu_patients_confirmed_covid_7_day_avg INTEGER
-CHECK (staffed_adult_icu_patients_confirmed_covid_7_day_avg > 0),
+all_adult_hospital_beds_7_day_avg NUMERIC
+CHECK ((all_adult_hospital_beds_7_day_avg >= 0) OR (all_adult_hospital_beds_7_day_avg = NULL)),
+all_pediatric_inpatient_beds_7_day_avg NUMERIC
+CHECK ((all_pediatric_inpatient_beds_7_day_avg >= 0) OR (all_pediatric_inpatient_beds_7_day_avg = NULL)),
+all_adult_hospital_inpatient_bed_occupied_7_day_coverage NUMERIC
+CHECK ((all_adult_hospital_inpatient_bed_occupied_7_day_coverage >= 0) OR (all_adult_hospital_inpatient_bed_occupied_7_day_coverage = NULL)),
+all_pediatric_inpatient_bed_occupied_7_day_avg NUMERIC
+CHECK ((all_pediatric_inpatient_bed_occupied_7_day_avg >= 0) OR (all_pediatric_inpatient_bed_occupied_7_day_avg = NULL)),
+total_icu_beds_7_day_avg NUMERIC
+CHECK ((total_icu_beds_7_day_avg >= 0) OR (total_icu_beds_7_day_avg = NULL)),
+icu_beds_used_7_day_avg NUMERIC
+CHECK ((icu_beds_used_7_day_avg >= 0) OR (icu_beds_used_7_day_avg = NULL)),
+inpatient_beds_used_covid_7_day_avg NUMERIC
+CHECK ((inpatient_beds_used_covid_7_day_avg >= 0) OR (inpatient_beds_used_covid_7_day_avg = NULL)),
+staffed_icu_adult_patients_confirmed_covid_7_day_avg NUMERIC
+CHECK ((staffed_icu_adult_patients_confirmed_covid_7_day_avg >= 0) OR (staffed_icu_adult_patients_confirmed_covid_7_day_avg = NULL)),
 PRIMARY KEY (hospital_pk, date)
 );
-/* Table holding the different Quality entities */
+
 CREATE TABLE quality_rating (
-facility_id TEXT REFERENCES hospital_basic_info (hospital_pk),
-year CHAR(4) NOT NULL,
+facility_id TEXT,
+date DATE,
 hospital_overall_rating INTEGER,
-PRIMARY KEY (facility_id, year)
+PRIMARY KEY (facility_id, date)
 );
