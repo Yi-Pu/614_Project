@@ -45,9 +45,9 @@ def add_to_database(file, date):
     num_hospitals_inserted = 0
     discard = pd.DataFrame(columns=file.columns)
 
-    check = pd.read_sql_query("SELECT hospital_pk"
+    check = pd.read_sql_query("SELECT facility_id"
                               " FROM hospital_basic_info", conn)
-    comparison = set(check.hospital_pk.unique())
+    comparison = set(check.facility_id.unique())
 
     with conn.transaction():
         for index, row in file.iterrows():
@@ -55,10 +55,10 @@ def add_to_database(file, date):
                 with conn.transaction():
                     cur.execute(
                         "INSERT INTO hospital_basic_info"
-                        "(hospital_pk, name, type, ownership_type,"
-                        " emergency_services)"
+                        "(facility_id, name, type,"
+                        " ownership_type, emergency_services)"
                         "VALUES (%s, %s, %s, %s, %s)"
-                        "ON CONFLICT(hospital_pk) DO UPDATE SET"
+                        "ON CONFLICT(facility_id) DO UPDATE SET"
                         "(type, ownership_type, emergency_services) ="
                         "(EXCLUDED.type, EXCLUDED.ownership_type,"
                         " EXCLUDED.emergency_services)",

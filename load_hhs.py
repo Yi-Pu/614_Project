@@ -23,7 +23,7 @@ def process_csv(file):
     hhs_df.replace(-999999, np.nan)
     hhs_df["collection_week"] = \
         hhs_df.collection_week.apply(
-        lambda x: datetime.strptime(str(x), '%d/%m/%Y'))
+        lambda x: datetime.strptime(str(x), '%m/%d/%Y'))
     hhs_df["geocoded_hospital_address"] = \
         hhs_df.geocoded_hospital_address.apply(lambda x: str(x))
     hhs_df["zip"] = hhs_df.zip.apply(lambda x: str(x))
@@ -54,10 +54,10 @@ def add_to_database(file):
 
     # Initial count
     num_rows_inserted = 0
-    num_hospitals_inserted  = 0
+    num_hospitals_inserted = 0
 
     check = pd.read_sql_query("SELECT hospital_pk"
-                              "FROM hospital_basic_info", conn)
+                              " FROM geographic_info", conn)
     comparison = set(check.hospital_pk.unique())
 
     with conn.transaction():
@@ -66,15 +66,18 @@ def add_to_database(file):
                 with conn.transaction():
                     # Update geographic_info
                     cur.execute(
-                        "INSERT INTO geographic_info (geocoded_hospital_address, \
+                        "INSERT INTO geographic_info (hospital_pk, \
+                            geocoded_hospital_address, \
                             zip, city, fips_code, state, address)"
-                        "VALUES (%s, %s, %s, %s, %s, %s)"
-                        "ON CONFLICT (geocoded_hospital_address) DO UPDATE SET"
-                        "(zip, city, fips_code, state, address) = \
-                            (EXCLUDED.zip, EXCLUDED.city, \
+                        "VALUES (%s, %s, %s, %s, %s, %s, %s)"
+                        "ON CONFLICT (hospital_pk) DO UPDATE SET"
+                        "(geocoded_hospital_address, zip, city, fips_code, state, address) = \
+                            (EXCLUDED.geocoded_hospital_address, \
+                            EXCLUDED.zip, EXCLUDED.city, \
                             EXCLUDED.fips_code, EXCLUDED.state, \
                             EXCLUDED.address)",
-                        (row['geocoded_hospital_address'],
+                        (row['hospital_pk'],
+                         row['geocoded_hospital_address'],
                          row['zip'], row['city'], row['fips_code'],
                          row['state'], row['address']))
 
@@ -100,18 +103,6 @@ def add_to_database(file):
                          row['icu_beds_used_7_day_avg'],
                          row['inpatient_beds_used_covid_7_day_avg'],
                          row['staffed_icu_adult_patients_confirmed_covid_7_day_avg']))
-
-                    # Update hospital_basic_info
-                    cur.execute(
-                        "INSERT INTO hospital_basic_info \
-                        (hospital_pk, name, geocoded_hospital_address, type)"
-                        "VALUES(%s, %s, %s, %s)"
-                        "ON CONFLICT (hospital_pk) DO UPDATE SET"
-                        "(name, geocoded_hospital_address, type) = \
-                        (EXCLUDED.name, EXCLUDED.geocoded_hospital_address, \
-                        EXCLUDED.type)",
-                        (row['hospital_pk'], row['hospital_name'],
-                         row['address'], row['hospital_subtype']))
 
             except Exception as e:
                 print(e)
