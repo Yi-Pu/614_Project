@@ -79,7 +79,6 @@ def add_to_database(file, date):
                             "VALUES (%s, to_date(%s, 'YYYY-MM-DD'), %s)",
                             (row["Facility ID"], date,
                              row['Hospital overall rating']))
-                    print("apple")
 
             except Exception as e:
                 print(e)
