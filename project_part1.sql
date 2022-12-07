@@ -33,7 +33,7 @@ PRIMARY KEY (facility_id, date)
 );
 
 CREATE TABLE geographic_info(
-hospital_pk TEXT PRIMARY KEY REFERENCES hospital_basic_info (facility_id),
+hospital_pk TEXT PRIMARY KEY,
 geocoded_hospital_address TEXT,
 zip TEXT,
 city TEXT,
@@ -43,7 +43,7 @@ address TEXT
 );
 
 CREATE TABLE hospital_capacity (
-hospital_pk TEXT REFERENCES hospital_basic_info (facility_id),
+hospital_pk TEXT,
 date DATE NOT NULL,
 all_adult_hospital_beds_7_day_avg NUMERIC
 CHECK ((all_adult_hospital_beds_7_day_avg >= 0) OR (all_adult_hospital_beds_7_day_avg = NULL)),
