@@ -26,7 +26,7 @@ emergency_services BOOLEAN DEFAULT FALSE
 );
 
 CREATE TABLE quality_rating (
-facility_id TEXT,
+facility_id TEXT REFERENCES hospital_basic_info (facility_id),
 date DATE,
 hospital_overall_rating INTEGER,
 PRIMARY KEY (facility_id, date)
