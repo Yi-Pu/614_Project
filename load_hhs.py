@@ -20,10 +20,13 @@ def process_csv(file):
     hhs_df = pd.read_csv(file)
 
     # Data wrangling
+<<<<<<< HEAD
     # num = hhs_df.select_dtypes(include=[np.float64, np.int64])
     # num[num < 0] = None
     num = hhs_df._get_numeric_data()
     num[num < 0] = -999999
+=======
+>>>>>>> 9d6c2f8dd55a4447a8e77085643ecc6323f57bae
     hhs_df = hhs_df.replace(-999999, None)
     hhs_df = hhs_df.replace(np.nan, None)
     hhs_df["collection_week"] = \
