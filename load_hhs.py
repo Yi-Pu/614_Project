@@ -20,7 +20,8 @@ def process_csv(file):
     hhs_df = pd.read_csv(file)
 
     # Data wrangling
-    hhs_df = hhs_df.replace(-999999, np.nan)
+    hhs_df = hhs_df.replace(-999999, None)
+    hhs_df = hhs_df.replace(np.nan, None)
     hhs_df["collection_week"] = \
         hhs_df.collection_week.apply(
         lambda x: datetime.strptime(str(x), '%Y-%m-%d'))
