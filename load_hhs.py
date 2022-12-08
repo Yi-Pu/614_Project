@@ -20,7 +20,12 @@ def process_csv(file):
     hhs_df = pd.read_csv(file)
 
     # Data wrangling
-    hhs_df.replace(-999999, np.nan)
+    # num = hhs_df.select_dtypes(include=[np.float64, np.int64])
+    # num[num < 0] = None
+    num = hhs_df._get_numeric_data()
+    num[num < 0] = -999999
+    hhs_df = hhs_df.replace(-999999, None)
+    hhs_df = hhs_df.replace(np.nan, None)
     hhs_df["collection_week"] = \
         hhs_df.collection_week.apply(
         lambda x: datetime.strptime(str(x), '%Y-%m-%d'))
@@ -44,8 +49,8 @@ def add_to_database(file):
     '''
 
     conn = psycopg.connect(
-        host="sculptor.stat.cmu.edu", dbname=credentials.DB_USER,
-        user=credentials.DB_USER, password=credentials.DB_PASSWORD)
+        host="sculptor.stat.cmu.edu", dbname="yipu",
+        user="yipu", password="eighi7Pha")
 
     cur = conn.cursor()
 
