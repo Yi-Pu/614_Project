@@ -23,7 +23,7 @@ def process_csv(file):
     hhs_df.replace(-999999, np.nan)
     hhs_df["collection_week"] = \
         hhs_df.collection_week.apply(
-        lambda x: datetime.strptime(str(x), '%m/%d/%Y'))
+        lambda x: datetime.strptime(str(x), '%Y-%m-%d'))
     hhs_df["geocoded_hospital_address"] = \
         hhs_df.geocoded_hospital_address.apply(lambda x: str(x))
     hhs_df["zip"] = hhs_df.zip.apply(lambda x: str(x))
