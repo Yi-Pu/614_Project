@@ -26,14 +26,14 @@ emergency_services BOOLEAN DEFAULT FALSE
 );
 
 CREATE TABLE quality_rating (
-facility_id TEXT,
+facility_id TEXT REFERENCES hospital_basic_info (facility_id),
 date DATE,
 hospital_overall_rating INTEGER,
 PRIMARY KEY (facility_id, date)
 );
 
 CREATE TABLE geographic_info(
-hospital_pk TEXT PRIMARY KEY,
+hospital_pk TEXT PRIMARY KEY REFERENCES hospital_basic_info (facility_id),
 geocoded_hospital_address TEXT,
 zip TEXT,
 city TEXT,
@@ -43,7 +43,7 @@ address TEXT
 );
 
 CREATE TABLE hospital_capacity (
-hospital_pk TEXT,
+hospital_pk TEXT REFERENCES hospital_basic_info (facility_id),
 date DATE NOT NULL,
 all_adult_hospital_beds_7_day_avg NUMERIC
 CHECK ((all_adult_hospital_beds_7_day_avg >= 0) OR (all_adult_hospital_beds_7_day_avg = NULL)),

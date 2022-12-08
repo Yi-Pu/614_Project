@@ -20,7 +20,8 @@ def process_csv(file):
     hhs_df = pd.read_csv(file)
 
     # Data wrangling
-    hhs_df.replace(-999999, np.nan)
+    hhs_df = hhs_df.replace(-999999, None)
+    hhs_df = hhs_df.replace(np.nan, None)
     hhs_df["collection_week"] = \
         hhs_df.collection_week.apply(
         lambda x: datetime.strptime(str(x), '%Y-%m-%d'))
@@ -56,14 +57,23 @@ def add_to_database(file):
     num_rows_inserted = 0
     num_hospitals_inserted = 0
 
-    check = pd.read_sql_query("SELECT hospital_pk"
-                              " FROM geographic_info", conn)
-    comparison = set(check.hospital_pk.unique())
+    check = pd.read_sql_query("SELECT facility_id"
+                              " FROM hospital_basic_info", conn)
+    comparison = set(check.facility_id.unique())
 
     with conn.transaction():
         for index, row in file.iterrows():
             try:
                 with conn.transaction():
+                    # Update hospital_basic_info
+                    cur.execute(
+                        "INSERT INTO hospital_basic_info"
+                        "(facility_id, name)"
+                        "VALUES (%s, %s)"
+                        "ON CONFLICT(facility_id) DO NOTHING",
+                        (row['hospital_pk'], row['hospital_name'])
+                    )
+
                     # Update geographic_info
                     cur.execute(
                         "INSERT INTO geographic_info (hospital_pk, \
