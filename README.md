@@ -1,7 +1,7 @@
 # 614_Project
 NOTE: We have slightly changed the schema from when we submitted Part 1 to fix some of the checks we had because we didn't notice how some of the columns would have zeros in hospital_capacity.
 
-First, make sure to establish the schema by loading the necessary data tables, which are detailed in project_part1.sql. Without these tables, the data will fail to generate.
+First, make sure to establish the schema by loading the necessary data tables, which are detailed in database_schema.sql. Without these tables, the data will fail to generate.
 
 In order to load the data, first make sure that the new CSV and the scripts are in the same directory. NOTE: They don't have to necessarily be in the same directory, but if they are not, you must include the whole path to the csv so that the script can access them.
 
