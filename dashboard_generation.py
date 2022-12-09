@@ -151,10 +151,10 @@ ax2=ax.twinx()
 ax.plot(
         list(beds.date.apply(lambda x: str(x))),
         beds['all_cases_beds_used_per_week'],
-        color = 'orange', 
+        color='orange', 
         marker="o")
 # set x-axis label
-ax.set_xlabel("year", fontsize = 14)
+ax.set_xlabel("year", fontsize=14)
 # set y-axis label
 ax.set_ylabel("All cases",
               color='orange',
@@ -163,10 +163,10 @@ ax.set_ylabel("All cases",
 # make a plot with different y-axis using second axis object
 ax2.plot(
     list(beds.date.apply(lambda x: str(x))),
-    beds['covid_cases_beds_used_per_week'], 
-    color = 'purple',
+    beds['covid_cases_beds_used_per_week'],
+    color='purple',
     marker="o")
-ax2.set_ylabel("Covid cases",color='purple',fontsize=14)
+ax2.set_ylabel("Covid cases", color='purple', fontsize=14)
 fig.autofmt_xdate()
 st.pyplot()
 

@@ -47,8 +47,8 @@ def add_to_database(file):
     '''
 
     conn = psycopg.connect(
-        host="sculptor.stat.cmu.edu", dbname="yipu",
-        user="yipu", password="eighi7Pha")
+            host="sculptor.stat.cmu.edu", dbname=credentials.DB_USER,
+            user=credentials.DB_USER, password=credentials.DB_PASSWORD)
 
     cur = conn.cursor()
 
